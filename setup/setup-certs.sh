@@ -3,6 +3,7 @@ set -e
 
 OUTPUT_DIR=/secrets/certs
 ZIP_FILE=$OUTPUT_DIR/certs.zip
+INSTANCE_FILE=/setup/"${1:-instance.yml}"
 
 printf "======= Generating Elastic Stack Certificates =======\n"
 printf "=====================================================\n"
@@ -17,7 +18,7 @@ find $OUTPUT_DIR -mindepth 1 -type d -exec rm -rf -- {} +
 rm -f $ZIP_FILE
 
 printf "Generating... \n"
-bin/elasticsearch-certutil cert --silent --pem --in /setup/instances.yml -out $ZIP_FILE &> /dev/null
+bin/elasticsearch-certutil cert --silent --pem --in $INSTANCE_FILE -out $ZIP_FILE &> /dev/null
 
 printf "Unzipping Certifications... \n"
 unzip -qq $ZIP_FILE -d $OUTPUT_DIR;
