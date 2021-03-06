@@ -3,3 +3,7 @@
 /secrets
 tools/elastalert/rules/*
 /solomon-secrets
+
+
+.env-prod
+.env-staging
