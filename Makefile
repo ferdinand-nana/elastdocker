@@ -1,9 +1,11 @@
 .DEFAULT_GOAL:=help
 
+SOLOMON_FILES := -f docker-compose.solomon.yml
 COMPOSE_ALL_FILES := -f docker-compose.yml -f docker-compose.monitor.yml -f docker-compose.tools.yml -f docker-compose.nodes.yml
 COMPOSE_MONITORING := -f docker-compose.yml -f docker-compose.monitor.yml
 COMPOSE_TOOLS := -f docker-compose.yml -f docker-compose.tools.yml
 COMPOSE_NODES := -f docker-compose.yml -f docker-compose.nodes.yml
+ELK_SOLOMON := elasticsearch kibana
 ELK_SERVICES   := elasticsearch logstash kibana
 ELK_MONITORING := elasticsearch-exporter logstash-exporter filebeat-cluster-logs
 ELK_TOOLS  := curator elastalert rubban
@@ -46,6 +48,9 @@ nodes:		    ## Start Two Extra Elasticsearch Nodes
 
 build:			## Build ELK and all its extra components.
 	@docker-compose ${COMPOSE_ALL_FILES} build ${ELK_ALL_SERVICES}
+
+build-solomon:
+	@docker-compose ${SOLOMON_FILES} build ${ELK_SOLOMON}
 
 down:			## Down ELK and all its extra components.
 	@docker-compose ${COMPOSE_ALL_FILES} down
