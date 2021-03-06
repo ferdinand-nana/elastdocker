@@ -1,48 +1,29 @@
 version: '3.5'
 
-# To Join any other app setup using another network, change name and set external = true
-networks:
-  default:
-    name: elastic
-    external: false
-
 # will contain all elasticsearch data.
 volumes:
-  elasticsearch-data:
-
-secrets:
-  elasticsearch.keystore:
-    file: ./solomon-secrets/keystore/${ENV}/elasticsearch.keystore
-  elastic.ca:
-    file: ./solomon-secrets/certs/${ENV}/ca/ca.crt
-  elasticsearch.certificate:
-    file: ./solomon-secrets/certs/${ENV}/elasticsearch/elasticsearch.crt
-  elasticsearch.key:
-    file: ./solomon-secrets/certs/${ENV}/elasticsearch/elasticsearch.key
-  kibana.certificate:
-    file: ./solomon-secrets/certs/${ENV}/kibana/kibana.crt
-  kibana.key:
-    file: ./solomon-secrets/certs/${ENV}/kibana/kibana.key
+  elasticsearch-data-1:
+  elasticsearch-data-2:
 
 services:
-  elasticsearch:
+  elasticsearch-1:
     image: ksd/es:${ELK_VERSION}-${ENV}
     build:
       context: elasticsearch/
       args:
         ELK_VERSION: ${ELK_VERSION}
-    restart: unless-stopped
+#    restart: unless-stopped
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
-      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_1}
       ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
       ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
       ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
       bootstrap.memory_lock: "true"
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - elasticsearch-data-1:/usr/share/elasticsearch/data
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ./elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
     secrets:
@@ -54,9 +35,6 @@ services:
         target: /usr/share/elasticsearch/config/certs/elasticsearch.crt
       - source: elasticsearch.key
         target: /usr/share/elasticsearch/config/certs/elasticsearch.key
-    ports:
-      - "9200:9200"
-      - "9300:9300"
     ulimits:
       memlock:
         soft: -1
@@ -64,26 +42,40 @@ services:
       nofile:
         soft: 200000
         hard: 200000
-
-  kibana:
-    image: ksd/kibana:elastdocker-${ELK_VERSION}-${ENV}
+        
+  elasticsearch-2:
+    image: ksd/es:${ELK_VERSION}-${ENV}
     build:
-      context: kibana/
+      context: elasticsearch/
       args:
-        ELK_VERSION: $ELK_VERSION
-    restart: unless-stopped
-    volumes:
-      - ./kibana/config/:/usr/share/kibana/config:ro
+        ELK_VERSION: ${ELK_VERSION}
+    #    restart: unless-stopped
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_2}
+      ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
+      ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
+      bootstrap.memory_lock: "true"
+    volumes:
+      - elasticsearch-data-2:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
     secrets:
+      - source: elasticsearch.keystore
+        target: /usr/share/elasticsearch/config/elasticsearch.keystore
       - source: elastic.ca
-        target: /certs/ca.crt
-      - source: kibana.certificate
-        target: /certs/kibana.crt
-      - source: kibana.key
-        target: /certs/kibana.key
-    ports:
-      - "5601:5601"
+        target: /usr/share/elasticsearch/config/certs/ca.crt
+      - source: elasticsearch.certificate
+        target: /usr/share/elasticsearch/config/certs/elasticsearch.crt
+      - source: elasticsearch.key
+        target: /usr/share/elasticsearch/config/certs/elasticsearch.key
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 200000
+        hard: 200000

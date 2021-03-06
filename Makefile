@@ -1,6 +1,6 @@
 .DEFAULT_GOAL:=help
 
-SOLOMON_FILES := -f docker-compose.solomon.yml
+SOLOMON_FILES := -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml
 COMPOSE_ALL_FILES := -f docker-compose.yml -f docker-compose.monitor.yml -f docker-compose.tools.yml -f docker-compose.nodes.yml
 COMPOSE_MONITORING := -f docker-compose.yml -f docker-compose.monitor.yml
 COMPOSE_TOOLS := -f docker-compose.yml -f docker-compose.tools.yml
@@ -37,6 +37,9 @@ all:		    ## Start Elk and all its component (ELK, Monitoring, and Tools).
 elk:		    ## Start ELK.
 	docker-compose up -d --build
 
+elk-solomon:		    ## Start ELK.
+	docker-compose ${SOLOMON_FILES} up --no-deps -d --no-recreate  
+
 monitoring:		## Start ELK Monitoring.
 	@docker-compose ${COMPOSE_MONITORING} up -d --build ${ELK_MONITORING}
 
@@ -50,7 +53,7 @@ build:			## Build ELK and all its extra components.
 	@docker-compose ${COMPOSE_ALL_FILES} build ${ELK_ALL_SERVICES}
 
 build-solomon:
-	@docker-compose ${SOLOMON_FILES} build ${ELK_SOLOMON}
+	@docker-compose ${SOLOMON_FILES} build --force-rm ${ELK_SOLOMON}
 
 down:			## Down ELK and all its extra components.
 	@docker-compose ${COMPOSE_ALL_FILES} down

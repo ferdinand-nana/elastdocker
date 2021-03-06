@@ -22,7 +22,7 @@ services:
       context: elasticsearch/
       args:
         ELK_VERSION: ${ELK_VERSION}
-    command: bash /setup/setup-certs.sh
+    command: bash /setup/setup-certs.sh instances.${ENV}.yml
     user: "0"
     volumes:
       - ./secrets:/secrets
