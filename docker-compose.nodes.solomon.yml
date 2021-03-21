@@ -6,7 +6,7 @@ volumes:
   elasticsearch-data-2:
 
 services:
-  elasticsearch-1:
+  es1:
     image: ksd/es:${ELK_VERSION}
     build:
       context: elasticsearch/
@@ -46,7 +46,7 @@ services:
         soft: 200000
         hard: 200000
         
-  elasticsearch-2:
+  es2:
     image: ksd/es:${ELK_VERSION}
     build:
       context: elasticsearch/

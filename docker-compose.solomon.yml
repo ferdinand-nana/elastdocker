@@ -29,7 +29,7 @@ secrets:
     file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
 
 services:
-  elasticsearch:
+  es0:
     image: ksd/es:${ELK_VERSION}
     build:
       context: elasticsearch/
@@ -98,3 +98,7 @@ services:
         target: /certs/elasticsearch-ca.pem
     ports:
       - "5601:5601"
+    links: 
+      - "es0:elasticsearch"
+    depends_on: 
+      - es0
