@@ -1,14 +1,18 @@
 instances:
+  # dns and ip were commented to create certificates
+  # that are applicable to all nodes regardless of dns or ip.
+  # This is ok if the certs used for SSL Transport can be re-used
+  # in all elasticsearch nodes.
   - name: elasticsearch
-    dns:
-      - elasticsearch
-      - localhost
-    ip:
-      - 127.0.0.1
+    # dns:
+    #   - elasticsearch
+    #   - localhost
+    # ip:
+    #   - 127.0.0.1
 
   - name: kibana
-    dns:
-      - kibana
-      - localhost
-    ip:
-      - 127.0.0.1
+    # dns:
+    #   - kibana
+    #   - localhost
+    # ip:
+    #   - 127.0.0.1
