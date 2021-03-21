@@ -2,11 +2,11 @@ version: '3.5'
 
 # will contain all elasticsearch data.
 volumes:
-  elasticsearch-data-1:
-  elasticsearch-data-2:
+  elasticsearch-data-3:
+  elasticsearch-data-4:
 
 services:
-  elasticsearch-1:
+  elasticsearch-3:
     image: ksd/es:${ELK_VERSION}
     build:
       context: elasticsearch/
@@ -18,14 +18,14 @@ services:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
-      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_1}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_3}
       ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
       ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
       ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
       bootstrap.memory_lock: "true"
     volumes:
-      - elasticsearch-data-1:/usr/share/elasticsearch/data
-      - ./elasticsearch/config/elasticsearch-node.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - elasticsearch-data-3:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch-data.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ./elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
     secrets:
       - source: elasticsearch.keystore
@@ -46,7 +46,7 @@ services:
         soft: 200000
         hard: 200000
         
-  elasticsearch-2:
+  elasticsearch-4:
     image: ksd/es:${ELK_VERSION}
     build:
       context: elasticsearch/
@@ -58,14 +58,14 @@ services:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
-      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_2}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_4}
       ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
       ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
       ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
       bootstrap.memory_lock: "true"
     volumes:
-      - elasticsearch-data-2:/usr/share/elasticsearch/data
-      - ./elasticsearch/config/elasticsearch-node.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - elasticsearch-data-4:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch-data.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ./elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
     secrets:
       - source: elasticsearch.keystore
