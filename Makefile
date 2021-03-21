@@ -1,6 +1,6 @@
 .DEFAULT_GOAL:=help
 
-SOLOMON_FILES := -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml
+SOLOMON_FILES := -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml -f docker-compose.data.solomon.yml
 COMPOSE_ALL_FILES := -f docker-compose.yml -f docker-compose.monitor.yml -f docker-compose.tools.yml -f docker-compose.nodes.yml
 COMPOSE_MONITORING := -f docker-compose.yml -f docker-compose.monitor.yml
 COMPOSE_TOOLS := -f docker-compose.yml -f docker-compose.tools.yml
