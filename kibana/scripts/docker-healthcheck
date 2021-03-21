@@ -2,7 +2,8 @@
 set -eo pipefail
 
 host="$(hostname --ip-address || echo '127.0.0.1')"
-if health="$(curl -fsSkL "https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@$host:5601/api/status" | python -c "import sys, json; print json.load(sys.stdin)['status']['overall']['state']")"; then
+# if health="$(curl -fsSkL "$KIBANA_SCHEME://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@$host:5601/api/status" | python -c "import sys, json; print json.load(sys.stdin)['status']['overall']['state']")"; then
+if health="$(curl -fsSkL "$KIBANA_SCHEME://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@$host:5601/api/status" | grep -Eo '"overall"[^}]*' | grep -Eo '"state"[^,]*' | grep -Eo '"green"[^"]*' | sed -r 's/"//g')"; then
 	health="$(echo "$health" | sed -r 's/^[[:space:]]+|[[:space:]]+$//g')" # trim whitespace (otherwise we'll have "green ")
 	if [ "$health" = 'green' ]; then
 		exit 0
