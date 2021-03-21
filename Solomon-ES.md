@@ -91,8 +91,8 @@ Setup
         - Attach to the container created:
             > docker exec -it es /bin/bash
         <br/>
-        - Then trigger the creation of the http certificates:
-            > ./bin/elasticsearch-certutil http
+        - Then trigger the creation of the http certificates (silent):
+            > ./bin/elasticsearch-certutil http -s
         <br/>
         - Follow the following answer to the questions (see characters in **bold**)
             > Generate a CSR? [y/N] **N**
@@ -215,8 +215,15 @@ Docker Compose Up
 -----
 Just run the following commad:
 ><i>make elk-solomon</i><br/>
+>**OR**</br>
+><i>docker-compose -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml -f docker-compose.data.solomon.yml up --no-deps -d --no-recreate kibana es0 es1 es2 es3 es4</i><br/>
 
-This is will put up the 5-node elasticsearch service including kibana
+The command above will put up the 5-node elasticsearch service including kibana
+</br>
+</br>
+To leave out the elasticsearch data nodes (es3 and es4), run the command:
+
+><i>docker-compose -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml -f docker-compose.data.solomon.yml up --no-deps -d --no-recreate kibana es0 es1 es2</i><br/>
 
 <br/>
 To test the elasticsearch service, run the command:
