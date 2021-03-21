@@ -1,6 +1,7 @@
 .idea/
 .DS_Store
-/secrets
+secrets/certs/*
+secrets/keystore/*
 tools/elastalert/rules/*
 
 .env-prod
