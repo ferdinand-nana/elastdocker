@@ -12,27 +12,32 @@ volumes:
 
 secrets:
   elasticsearch.keystore:
-    file: ./secrets/keystore/elasticsearch.keystore
+    file: ./solomon-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
   elastic.ca:
-    file: ./secrets/certs/ca/ca.crt
+    file: ./solomon-secrets/${ENV}/ssl/certs/ca/ca.crt
   elasticsearch.certificate:
-    file: ./secrets/certs/elasticsearch/elasticsearch.crt
+    file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
   elasticsearch.key:
-    file: ./secrets/certs/elasticsearch/elasticsearch.key
+    file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
+  elasticsearch.http.keystore:
+    file: ./solomon-secrets/${ENV}/http/elasticsearch/http.p12
   kibana.certificate:
-    file: ./secrets/certs/kibana/kibana.crt
+    file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.crt
   kibana.key:
-    file: ./secrets/certs/kibana/kibana.key
+    file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.key
+  kibana.http.ca:
+    file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
 
 services:
   elasticsearch:
-    image: elasticsearch:elastdocker-${ELK_VERSION}
+    image: ksd/es:${ELK_VERSION}
     build:
       context: elasticsearch/
       args:
         ELK_VERSION: ${ELK_VERSION}
     restart: unless-stopped
     environment:
+      ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME}
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
@@ -43,7 +48,7 @@ services:
       bootstrap.memory_lock: "true"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/config/elasticsearch-master.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ./elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
     secrets:
       - source: elasticsearch.keystore
@@ -54,6 +59,8 @@ services:
         target: /usr/share/elasticsearch/config/certs/elasticsearch.crt
       - source: elasticsearch.key
         target: /usr/share/elasticsearch/config/certs/elasticsearch.key
+      - source: elasticsearch.http.keystore
+        target: /usr/share/elasticsearch/config/certs/http.p12
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -66,7 +73,7 @@ services:
         hard: 200000
 
   logstash:
-    image: logstash:elastdocker-${ELK_VERSION}
+    image: ksd/logstash:${ELK_VERSION}
     build:
       context: logstash/
       args:
@@ -86,7 +93,7 @@ services:
       - "9600:9600"
 
   kibana:
-    image: kibana:elastdocker-${ELK_VERSION}
+    image: ksd/kibana:${ELK_VERSION}
     build:
       context: kibana/
       args:
@@ -95,6 +102,8 @@ services:
     volumes:
       - ./kibana/config/:/usr/share/kibana/config:ro
     environment:
+      ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME}
+      KIBANA_SCHEME: ${KIBANA_SCHEME}
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
@@ -105,5 +114,7 @@ services:
         target: /certs/kibana.crt
       - source: kibana.key
         target: /certs/kibana.key
+      - source: kibana.http.ca
+        target: /certs/elasticsearch-ca.pem
     ports:
       - "5601:5601"
