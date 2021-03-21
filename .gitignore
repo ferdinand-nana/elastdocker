@@ -1,4 +1,10 @@
 .idea/
+**/.vscode/*
 .DS_Store
 /secrets
 tools/elastalert/rules/*
+/solomon-secrets
+
+
+.env-prod
+.env-staging

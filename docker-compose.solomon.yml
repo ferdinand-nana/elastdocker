@@ -29,7 +29,7 @@ secrets:
     file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
 
 services:
-  elasticsearch:
+  es0:
     image: ksd/es:${ELK_VERSION}
     build:
       context: elasticsearch/
@@ -72,26 +72,6 @@ services:
         soft: 200000
         hard: 200000
 
-  logstash:
-    image: ksd/logstash:${ELK_VERSION}
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    restart: unless-stopped
-    volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
-    environment:
-      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
-      LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP}"
-    ports:
-      - "5044:5044"
-      - "9600:9600"
-
   kibana:
     image: ksd/kibana:${ELK_VERSION}
     build:
@@ -118,3 +98,7 @@ services:
         target: /certs/elasticsearch-ca.pem
     ports:
       - "5601:5601"
+    links: 
+      - "es0:elasticsearch"
+    depends_on: 
+      - es0
