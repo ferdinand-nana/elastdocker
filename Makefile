@@ -39,6 +39,8 @@ elk:		    ## Start ELK.
 
 elk-solomon:		    ## Start ELK.
 	docker-compose ${SOLOMON_FILES} up --no-deps -d --no-recreate  
+up:
+	@make elk
 
 monitoring:		## Start ELK Monitoring.
 	@docker-compose ${COMPOSE_MONITORING} up -d --build ${ELK_MONITORING}
