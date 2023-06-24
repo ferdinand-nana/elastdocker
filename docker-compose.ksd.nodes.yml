@@ -7,7 +7,7 @@ volumes:
 
 services:
   es1:
-    image: ksd/es:${ELK_VERSION}
+    image: ksd/es:${ELK_VERSION}-${ENV}
     build:
       context: elasticsearch/
       args:
@@ -47,7 +47,7 @@ services:
         hard: 200000
         
   es2:
-    image: ksd/es:${ELK_VERSION}
+    image: ksd/es:${ELK_VERSION}-${ENV}
     build:
       context: elasticsearch/
       args:

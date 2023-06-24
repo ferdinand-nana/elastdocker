@@ -30,7 +30,7 @@ secrets:
 
 services:
   es0:
-    image: ksd/es:${ELK_VERSION}
+    image: ksd/es:${ELK_VERSION}-${ENV}
     build:
       context: elasticsearch/
       args:
@@ -73,7 +73,7 @@ services:
         hard: 200000
 
   kibana:
-    image: ksd/kibana:${ELK_VERSION}
+    image: ksd/kibana:${ELK_VERSION}-${ENV}
     build:
       context: kibana/
       args:
