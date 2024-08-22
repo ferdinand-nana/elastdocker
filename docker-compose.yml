@@ -13,6 +13,8 @@ volumes:
 secrets:
   elasticsearch.keystore:
     file: ./solomon-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
+  elasticsearch.service_tokens:
+    file: ./secrets/service_tokens
   elastic.ca:
     file: ./solomon-secrets/${ENV}/ssl/certs/ca/ca.crt
   elasticsearch.certificate:
@@ -27,6 +29,10 @@ secrets:
     file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.key
   kibana.http.ca:
     file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
+  apm-server.certificate:
+    file: ./solomon-secrets/${ENV}/ssl/certs/apm-server/apm-server.crt
+  apm-server.key:
+    file: ./solomon-secrets/${ENV}/ssl/certs/apm-server/apm-server.key
 
 services:
   elasticsearch:
@@ -44,7 +50,8 @@ services:
       ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME}
       ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
       ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
-      ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
+      ELASTICSEARCH_PORT: ${ELASTICSEARCH_PORT}
+      ES_JAVA_OPTS: "-Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true -Dlog4j2.formatMsgNoLookups=true"
       bootstrap.memory_lock: "true"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
@@ -53,6 +60,8 @@ services:
     secrets:
       - source: elasticsearch.keystore
         target: /usr/share/elasticsearch/config/elasticsearch.keystore
+      - source: elasticsearch.service_tokens
+        target: /usr/share/elasticsearch/config/service_tokens
       - source: elastic.ca
         target: /usr/share/elasticsearch/config/certs/ca.crt
       - source: elasticsearch.certificate
@@ -62,7 +71,7 @@ services:
       - source: elasticsearch.http.keystore
         target: /usr/share/elasticsearch/config/certs/http.p12
     ports:
-      - "9200:9200"
+      - "${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}"
       - "9300:9300"
     ulimits:
       memlock:
@@ -71,6 +80,8 @@ services:
       nofile:
         soft: 200000
         hard: 200000
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:$ELASTICSEARCH_PORT/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
 
   logstash:
     image: ksd/logstash:${ELK_VERSION}
@@ -83,14 +94,19 @@ services:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    secrets:
+      - source: elastic.ca
+        target: /certs/ca.crt
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
-      LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP}"
+      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP} -Dlog4j2.formatMsgNoLookups=true"
     ports:
       - "5044:5044"
       - "9600:9600"
+    healthcheck:
+      test: ["CMD", "curl", "-s" ,"-XGET", "http://127.0.0.1:9600"]
 
   kibana:
     image: ksd/kibana:${ELK_VERSION}
@@ -106,7 +122,10 @@ services:
       KIBANA_SCHEME: ${KIBANA_SCHEME}
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      KIBANA_PORT: ${KIBANA_PORT}
+    env_file:
+      - ./secrets/.env.kibana.token
     secrets:
       - source: elastic.ca
         target: /certs/ca.crt
@@ -117,4 +136,28 @@ services:
       - source: kibana.http.ca
         target: /certs/elasticsearch-ca.pem
     ports:
-      - "5601:5601"
+      - "${KIBANA_PORT}:${KIBANA_PORT}"
+
+  apm-server:
+    image: elastdocker/apm-server:${ELK_VERSION}
+    build:
+      context: apm-server/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./apm-server/config/apm-server.yml:/usr/share/apm-server/apm-server.yml:ro
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      ELASTIC_APM_SECRET_TOKEN: ${ELASTIC_APM_SECRET_TOKEN}
+    secrets:
+      - source: elastic.ca
+        target: /certs/ca.crt
+      - source: apm-server.certificate
+        target: /certs/apm-server.crt
+      - source: apm-server.key
+        target: /certs/apm-server.key

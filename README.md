@@ -1,15 +1,22 @@
 <p align="center">
-<img width="680px" src="https://user-images.githubusercontent.com/16992394/65840473-f70ca780-e319-11e9-9245-29ec0a8948d6.png">
+<img width="500px" src="https://user-images.githubusercontent.com/16992394/147855783-07b747f3-d033-476f-9e06-96a4a88a54c6.png">
 </p>
-<h2 align="center">Elastic Stack on Docker with Preconfigured Security, Tools, Self-Monitoring, and Prometheus Metrics Exporters</h2>
-<h4 align="center">With tools like Curator, Rubban, ElastAlert for Alerting.</h4>
+<h2 align="center"><b>Elast</b>ic Stack on <b>Docker</b></h2>
+<h3 align="center">Preconfigured Security, Tools, and Self-Monitoring</h3>
+<h4 align="center">Configured to be ready to be used for Log, Metrics, APM, Alerting, Machine Learning, and Security (SIEM) usecases.</h4>
 <p align="center">
    <a>
-      <img src="https://img.shields.io/badge/Elastic%20Stack-7.15.0-blue?style=flat&logo=elasticsearch" alt="Elastic Stack Version 7^^">
+      <img src="https://img.shields.io/badge/Elastic%20Stack-8.13.4-blue?style=flat&logo=elasticsearch" alt="Elastic Stack Version 7^^">
    </a>
    <a>
       <img src="https://img.shields.io/github/v/tag/sherifabdlnaby/elastdocker?label=release&amp;sort=semver">
-    </a>
+   </a>
+   <a href="https://github.com/sherifabdlnaby/elastdocker/actions/workflows/build.yml">
+      <img src="https://github.com/sherifabdlnaby/elastdocker/actions/workflows/build.yml/badge.svg">
+   </a>
+   <a>
+      <img src="https://img.shields.io/badge/Log4Shell-mitigated-brightgreen?style=flat&logo=java">
+   </a>
    <a>
       <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" alt="contributions welcome">
    </a>
@@ -27,25 +34,29 @@
 # Introduction
 Elastic Stack (**ELK**) Docker Composition, preconfigured with **Security**, **Monitoring**, and **Tools**; Up with a Single Command.
 
-Based on [Official Elastic Docker Images](https://www.docker.elastic.co/)
+Suitable for Demoing, MVPs and small production deployments.
 
-Stack Version: [7.15.0](https://www.elastic.co/blog/elastic-stack-7-13-2-released)
-> You can change Elastic Stack version by setting `ELK_VERSION` in `.env` file and rebuild your images. Any version >= 7.0.0 is compatible with this template.
+Stack Version: [8.13.4](https://www.elastic.co/blog/whats-new-elastic-8-13-4) 🎉  - Based on [Official Elastic Docker Images](https://www.docker.elastic.co/)
+> You can change Elastic Stack version by setting `ELK_VERSION` in `.env` file and rebuild your images. Any version >= 8.0.0 is compatible with this template.
 
 ### Main Features 📜
 
-- Configured as Production Single Node Cluster. (With a multi-node cluster option for experimenting).
-- Deployed on a Single Docker Host or a Docker Swarm Cluster.
-- Security Enabled (under basic license).
-- SSL Enabled for Transport Layer and Kibana.
+- Configured as a Production Single Node Cluster. (With a multi-node cluster option for experimenting).
+- Security Enabled By Default.
+- Configured to Enable:
+  - Logging & Metrics Ingestion
+    - Option to collect logs of all Docker Containers running on the host. via `make collect-docker-logs`.
+  - APM
+  - Alerting
+  - Machine Learning
+  - Anomaly Detection
+  - SIEM (Security information and event management).
+  - Enabling Trial License
 - Use Docker-Compose and `.env` to configure your entire stack parameters.
 - Persist Elasticsearch's Keystore and SSL Certifications.
 - Self-Monitoring Metrics Enabled.
 - Prometheus Exporters for Stack Metrics.
 - Embedded Container Healthchecks for Stack Images.
-- [ElastAlert](https://github.com/Yelp/elastalert) preconfigured for Alerting.
-- [Curator](https://github.com/elastic/curator) with Crond preconfigured for Automated Scheduled tasks (e.g Snapshots to S3).
-- [Rubban](https://github.com/sherifabdlnaby/rubban) for Kibana curating tasks.
 
 #### More points
 And comparing Elastdocker and the popular [deviantony/docker-elk](https://github.com/deviantony/docker-elk)
@@ -74,7 +85,7 @@ Elastdocker differs from `deviantony/docker-elk` in the following points.
 
 - Configuring the Self-Monitoring and the Filebeat agent that ship ELK logs to ELK itself. (as a step to shipping it to a monitoring cluster in the future).
 
-- Configured tools and Prometheus Exporters.
+- Configured Prometheus Exporters.
 
 - The Makefile that simplifies everything into some simple commands.
 
@@ -85,8 +96,8 @@ Elastdocker differs from `deviantony/docker-elk` in the following points.
 
 # Requirements
 
-- [Docker 17.05 or higher](https://docs.docker.com/install/)
-- [Docker-Compose 3 or higher](https://docs.docker.com/compose/install/)
+- [Docker 20.05 or higher](https://docs.docker.com/install/)
+- [Docker-Compose 1.29 or higher](https://docs.docker.com/compose/install/)
 - 4GB RAM (For Windows and MacOS make sure Docker's VM has more than 4GB+ memory.)
 
 # Setup
@@ -102,7 +113,7 @@ Elastdocker differs from `deviantony/docker-elk` in the following points.
     > **For Linux's docker hosts only**. By default virtual memory [is not enough](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html) so run the next command as root `sysctl -w vm.max_map_count=262144`
 3. Start Elastic Stack
     ```bash
-    $ make elk           <OR>         $ docker-compose up -d
+    $ make elk           <OR>         $ docker-compose up -d		<OR>		$ docker compose up -d
     ```
 4. Visit Kibana at [https://localhost:5601](https://localhost:5601) or `https://<your_public_ip>:5601`
 
@@ -110,24 +121,10 @@ Elastdocker differs from `deviantony/docker-elk` in the following points.
 
     > - Notice that Kibana is configured to use HTTPS, so you'll need to write `https://` before `localhost:5601` in the browser.
     > - Modify `.env` file for your needs, most importantly `ELASTIC_PASSWORD` that setup your superuser `elastic`'s password, `ELASTICSEARCH_HEAP` & `LOGSTASH_HEAP` for Elasticsearch & Logstash Heap Size.
+    
+> Whatever your Host (e.g AWS EC2, Azure, DigitalOcean, or on-premise server), once you expose your host to the network, ELK component will be accessible on their respective ports. Since the enabled TLS uses a self-signed certificate, it is recommended to SSL-Terminate public traffic using your signed certificates. 
 
-Whatever your Host (e.g AWS EC2, Azure, DigitalOcean, or on-premise server), once you expose your host to the network, ELK component will be accessible on their respective ports.
-
-### Docker Swarm Support
-
-Elastdocker can be deployed to Docker Swarm using `make swarm-deploy`
-
-<details><summary>Expand</summary>
-<p>
-
-However it is not recommended to [depend on Docker Swarm](https://boxboat.com/2019/12/10/migrate-docker-swarm-to-kubernetes/); if your scale needs a multi-host cluster to host your ELK then Kubernetes is the recommended next step.
-
-Elastdocker should be used for small production workloads enough to fit on a single host.
-
-> Docker Swarm lacks some features such as `ulimits` used to disable swapping in Elasticsearch container, please change `bootstrap.memory_lock` to `false` in docker-compose.yml and find an [alternative way](https://www.elastic.co/guide/en/elasticsearch/reference/master/setup-configuration-memory.html) to disable swapping in your swarm cluster.
-
-</p>
-</details>
+> 🏃🏻‍♂️ To start ingesting logs, you can start by running `make collect-docker-logs` which will collect your host's container logs.
 
 ## Additional Commands
 
@@ -138,9 +135,9 @@ Elastdocker should be used for small production workloads enough to fit on a sin
 ```shell
 $ make monitoring
 ```
-#### To Start Tools (ElastAlert, Rubban, and Curator)
+#### To Ship Docker Container Logs to ELK 
 ```shell
-$ make tools
+$ make collect-docker-logs
 ```
 #### To Start **Elastic Stack, Tools and Monitoring**
 ```
@@ -171,18 +168,14 @@ $ make prune
 
 * Some Configuration are parameterized in the `.env` file.
   * `ELASTIC_PASSWORD`, user `elastic`'s password (default: `changeme` _pls_).
-  * `ELK_VERSION` Elastic Stack Version (default: `7.15.0`)
+  * `ELK_VERSION` Elastic Stack Version (default: `8.13.4`)
   * `ELASTICSEARCH_HEAP`, how much Elasticsearch allocate from memory (default: 1GB -good for development only-)
   * `LOGSTASH_HEAP`, how much Logstash allocate from memory.
   * Other configurations which their such as cluster name, and node name, etc.
 * Elasticsearch Configuration in `elasticsearch.yml` at `./elasticsearch/config`.
-* Logstash Configuration in `logstash.yml` at `./elasticsearch/config/logstash.yml`.
-* Logstash Pipeline in `main.conf` at `./elasticsearch/pipeline/main.conf`.
+* Logstash Configuration in `logstash.yml` at `./logstash/config/logstash.yml`.
+* Logstash Pipeline in `main.conf` at `./logstash/pipeline/main.conf`.
 * Kibana Configuration in `kibana.yml` at `./kibana/config`.
-* ElastAlert Configuration in `./tools/elastalert/config`.
-* ElastAlert Alert rules in `./tools/elastalert/rules`, [head to ElastAlert docs to lookup how to create alerts.](https://elastalert.readthedocs.io/en/latest/elastalert.html)
-* Curator Actions at `./tools/curator/actions` and `./tools/curator/crontab`.
-* Rubban Configuration using Docker-Compose passed Environment Variables.
 
 ### Setting Up Keystore
 
@@ -193,22 +186,10 @@ To Re-generate Keystore:
 make keystore
 ```
 
-### Enable SSL on HTTP
-
-By default, only Transport Layer has SSL Enabled, to enable SSL on HTTP layer, add the following lines to `elasticsearch.yml`
-```yaml
-## - http
-xpack.security.http.ssl.enabled: true
-xpack.security.http.ssl.key: certs/elasticsearch.key
-xpack.security.http.ssl.certificate: certs/elasticsearch.crt
-xpack.security.http.ssl.certificate_authorities: certs/ca.crt
-xpack.security.http.ssl.client_authentication: optional
-```
-
-> ⚠️ Enabling SSL on HTTP layer will require all clients that connect to Elasticsearch to configure SSL connection for HTTP, this includes all the current configured parts of the stack (e.g Logstash, Kibana, Curator, etc) plus any library/binding that connects to Elasticsearch from your application code.
-
-
 ### Notes
+
+
+- ⚠️ Elasticsearch HTTP layer is using SSL, thus mean you need to configure your elasticsearch clients with the `CA` in `secrets/certs/ca/ca.crt`, or configure client to ignore SSL Certificate Verification (e.g `--insecure` in `curl`).
 
 - Adding Two Extra Nodes to the cluster will make the cluster depending on them and won't start without them again.
 
@@ -228,7 +209,48 @@ xpack.security.http.ssl.client_authentication: optional
 
 ---------------------------
 
+![Intro](https://user-images.githubusercontent.com/16992394/156664447-c24c49f4-4282-4d6a-81a7-10743cfa384e.png)
+![Alerting](https://user-images.githubusercontent.com/16992394/156664848-d14f5e58-8f80-497d-a841-914c05a4b69c.png)
+![Maps](https://user-images.githubusercontent.com/16992394/156664562-d38e11ee-b033-4b91-80bd-3a866ad65f56.png)
+![ML](https://user-images.githubusercontent.com/16992394/156664695-5c1ed4a7-82f3-47a6-ab5c-b0ce41cc0fbe.png)
+
+# Working with Elastic APM
+
+After completing the setup step, you will notice a container named apm-server which gives you deeper visibility into your applications and can help you to identify and resolve root cause issues with correlated traces, logs, and metrics.
+
+## Authenticating with Elastic APM
+
+In order to authenticate with Elastic APM, you will need the following:
+
+- The value of `ELASTIC_APM_SECRET_TOKEN` defined in `.env` file as we have [secret token](https://www.elastic.co/guide/en/apm/guide/master/secret-token.html) enabled by default
+- The ability to reach port `8200`
+- Install elastic apm client in your application e.g. for NodeJS based applications you need to install [elastic-apm-node](https://www.elastic.co/guide/en/apm/agent/nodejs/master/typescript.html)
+- Import the package in your application and call the start function, In case of NodeJS based application you can do the following:
+
+```
+const apm = require('elastic-apm-node').start({
+  serviceName: 'foobar',
+  secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
+  
+  // https is enabled by default as per elastdocker configuration
+  serverUrl: 'https://localhost:8200',
+})
+```
+> Make sure that the agent is started before you require any other modules in your Node.js application - i.e. before express, http, etc. as mentioned in [Elastic APM Agent - NodeJS initialization](https://www.elastic.co/guide/en/apm/agent/nodejs/master/express.html#express-initialization)
+
+For more details or other languages you can check the following:
+- [APM Agents in different languages](https://www.elastic.co/guide/en/apm/agent/index.html)
+
 # Monitoring The Cluster
+
+### Via Self-Monitoring
+
+Head to Stack Monitoring tab in Kibana to see cluster metrics for all stack components.
+
+![Overview](https://user-images.githubusercontent.com/16992394/156664539-cc7e1a69-f1aa-4aca-93f6-7aedaabedd2c.png)
+![Moniroting](https://user-images.githubusercontent.com/16992394/156664647-78cfe2af-489d-4c35-8963-9b0a46904cf7.png)
+
+> In Production, cluster metrics should be shipped to another dedicated monitoring cluster.
 
 ### Via Prometheus Exporters
 If you started Prometheus Exporters using `make monitoring` command. Prometheus Exporters will expose metrics at the following ports.
@@ -240,18 +262,9 @@ If you started Prometheus Exporters using `make monitoring` command. Prometheus 
 
 ![Metrics](https://user-images.githubusercontent.com/16992394/78685076-89a58900-78f1-11ea-959b-ce374fe51500.jpg)
 
-### Via Self-Monitoring
-
-Head to Stack Monitoring tab in Kibana to see cluster metrics for all stack components.
-
-![Metrics](https://user-images.githubusercontent.com/16992394/65841358-b0bb4680-e321-11e9-9a71-36a1d6fb2a41.png)
-![Metrics](https://user-images.githubusercontent.com/16992394/65841362-b6189100-e321-11e9-93e4-b7b2caa5a37d.jpg)
-
-> In Production, cluster metrics should be shipped to another dedicated monitoring cluster.
-
 # License
 [MIT License](https://raw.githubusercontent.com/sherifabdlnaby/elastdocker/master/LICENSE)
-Copyright (c) 2020 Sherif Abdel-Naby
+Copyright (c) 2022 Sherif Abdel-Naby
 
 # Contribution
 
