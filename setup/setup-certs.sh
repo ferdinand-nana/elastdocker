@@ -1,10 +1,12 @@
+#!/bin/bash
+
 # Exit on Error
 set -e
 
 OUTPUT_DIR=/secrets/certs
 ZIP_CA_FILE=$OUTPUT_DIR/ca.zip
 ZIP_FILE=$OUTPUT_DIR/certs.zip
-INSTANCE_FILE=/setup/"${1:-instance.yml}"
+# INSTANCE_FILE=/setup/"${1:-instance.yml}"
 
 printf "======= Generating Elastic Stack Certificates =======\n"
 printf "=====================================================\n"
@@ -21,7 +23,7 @@ mkdir -p $OUTPUT_DIR/ca
 
 
 printf "Generating CA Certificates... \n"
-PASSWORD=`openssl rand -base64 32`
+PASSWORD=$(openssl rand -base64 32)
 /usr/share/elasticsearch/bin/elasticsearch-certutil ca --pass "$PASSWORD" --pem --out $ZIP_CA_FILE &> /dev/null
 printf "Generating Certificates... \n"
 unzip -qq $ZIP_CA_FILE -d $OUTPUT_DIR;

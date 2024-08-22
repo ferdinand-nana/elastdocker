@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Exit on Error
 set -e
 
