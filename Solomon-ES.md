@@ -5,20 +5,21 @@ Provide credentials
 -----------
 The following properties must be set properly in the corresponding .env file
 
->ELASTIC_USERNAME=_**elastic**_<br/>
->ELASTIC_PASSWORD=_**changeme**_
+```console
+ELASTIC_USERNAME=elastic
+ELASTIC_PASSWORD=changeme
+```
 
 Setup
 -----------
-
-
 1. Encrypting communications between nodes in a cluster
     - Creation of certificates<br/>
         Trigger the creation of certificates, run:
-        > make setup
-
+        ```console
+        make setup
+        ```
+        
         Created certificates will be generated under certs folder with the following file structure:
-
         ```console
         certs
         |---- ca
@@ -36,6 +37,7 @@ Setup
         |----- elasticsearch.keystore
         ```
 
+
         Copy the created **`certs`** and **`keystore`** directories under the directory<br/>
         > solomon-secrets/**\$\{ENV\}**/ssl<br/>
         > Note: The **\$\{ENV\}** corresponds to the set **ENV** value defined in .env file
@@ -44,44 +46,40 @@ Setup
 
     - Configure secrets 
         <br/>
-        Update the correponding _**`docker-compose.ksd.yml`**_ files<br/>
+        Update the correponding **`docker-compose.ksd.yml`** files<br/>
 
         ```console
         secrets:
-            elasticsearch.keystore:
-                file: ./solomon-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
-            elastic.ca:
-                file: ./solomon-secrets/${ENV}/ssl/certs/ca/ca.crt
-            elasticsearch.certificate:
-                file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
-            elasticsearch.key:
-                file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
-            kibana.certificate:
-                file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.crt
-            kibana.key:
-                file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.key
-        
-        Note: The ${ENV} corresponds to the set ENV value defined in .env file
+          elasticsearch.keystore:
+            file: ./solomon-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
+          elastic.ca:
+            file: ./solomon-secrets/${ENV}/ssl/certs/ca/ca.crt
+          elasticsearch.certificate:
+            file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
+          elasticsearch.key:
+            file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
+          kibana.certificate:
+            file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.crt
+          kibana.key:
+            file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.key
         ```
+        > Note: The ${ENV} corresponds to the set ENV value defined in .env file
 
-        <br/>
-        Update as well the **elasticsearch** service<br/>
-
-        
+        \
+        Update as well the **`elasticsearch`** service
         ```console
         secrets:
-            - source: elasticsearch.keystore<br/>
-              target: /usr/share/elasticsearch/config/elasticsearch.keystore<br/>
-            - source: elastic.ca<br/>
-              target: /usr/share/elasticsearch/config/certs/ca.crt<br/>
-            - source: elasticsearch.certificate<br/>
-              target: /usr/share/elasticsearch/config/certs/elasticsearch.crt<br/>
-            - source: elasticsearch.key<br/>
-              target: /usr/share/elasticsearch/config/certs/elasticsearch.key<br/>
+          - source: elasticsearch.keystore
+            target: /usr/share/elasticsearch/config/elasticsearch.keystore
+          - source: elastic.ca
+            target: /usr/share/elasticsearch/config/certs/ca.crt
+          - source: elasticsearch.certificate
+            target: /usr/share/elasticsearch/config/certs/elasticsearch.crt
+          - source: elasticsearch.key
+            target: /usr/share/elasticsearch/config/certs/elasticsearch.key
         ```
-        <br/>
-        And the **kibana** service as well
-
+        
+        And the **`kibana`** service as well
         ```console
         secrets:
             - source: elastic.ca
@@ -92,25 +90,25 @@ Setup
               target: /certs/kibana.key
         ```
 
-<br/>
+
 
 2. Encrypting HTTP client communications
     - Creation of KeyStore containing the certificate to enable TLS on the HTTP layer
         - Spawn an elasticsearch container using the command:
             ```console
-            docker run --rm --name es -p 19200:9200 -p 19300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+            docker run --rm --name es -p 19200:9200 -p 19300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.10.4
             ```
         
         - Attach to the container created:
             ```console
-            docker exec -it es **/bin/bash**
+            docker exec -it es /bin/bash
             ```
 
-        
         - Then trigger the creation of the http certificates (silent):
             ```console
             ./bin/elasticsearch-certutil http -s
             ```
+        
         - Follow the following answer to the questions (see characters in **bold**)
             > Generate a CSR? [y/N] **N**
             <br/>
@@ -161,141 +159,164 @@ Setup
             <br/>
             <br/>
             >Zip file written to /usr/share/elasticsearch/elasticsearch-ssl-http.zip
-        <br/>
+        
         - Go to the directory below (or create if needed)
-            > solomon-secrets > ** \$\{ENV\}** > http<br/>
-            > Note: The ** \$\{ENV\}** corresponds to the set **ENV** value defined in .env file
-        <br/>
-        - Copy the created zip file to solomon-secrets > ** \$\{ENV\}** > http by running the command:
-            > docker cp es:/usr/share/elasticsearch/elasticsearch-ssl-http.zip .
-        <br/>
+            > solomon-secrets/**\$\{ENV\}**/http<br/>
+            > Note: The **\$\{ENV\}** corresponds to the set **ENV** value defined in .env file
+        
+        - Copy the created zip file to `solomon-secrets/${ENV}/http` by running the command:
+            ```console
+            docker cp es:/usr/share/elasticsearch/elasticsearch-ssl-http.zip .
+            ```
+        
         - Unzip the file
-            > unzip -qq elasticsearch-ssl-http.zip -d .
-        <br/>
+            ```console
+            unzip -qq elasticsearch-ssl-http.zip -d .
+            ```
+        
         - Apply necessary permissions
-            > find . -type f -exec chmod 655 -- {} +
+            ```console
+            find . -type f -exec chmod 655 -- {} +
+            ```
 
         - Created certificates will be generated under certs folder with the following file structure:
-
-            >|- **ca**<br/>
-            >|   |- ca.p12<br/>
-            >|   |- README.txt<br/>
-            >|<br/>
-            >|- **elasticsearch**<br/>
-            >|   |- http.p12<br/>
-            >|   |- README.txt<br/>
-            >|   |- sample-elasticsearch.yml<br/>
-            >|<br/>
-            >|- **kibana**<br/>
-            >    |- elasticsearch-ca.pem<br/>
-            >    |- README.txt<br/>
-            >    |- sample-kibana.yml<br/>
-
-            Note: Follow the instructions as specified in the README.txt (See the next point below)
+            ```console
+            |- ca
+            |  |- ca.p12
+            |  |- README.txt
+            |
+            |- elasticsearch
+            |  |- http.p12
+            |  |- README.txt
+            |  |- sample-elasticsearch.yml
+            |
+            |- kibana
+               |- elasticsearch-ca.pem
+               |- README.txt
+               |- sample-kibana.yml
+            ```
+            > Note: Follow the instructions as specified in the README.txt (See the next point below)
 
     - Configure secrets
-        >secrets:<br/>
-        >  elasticsearch.http.keystore:<br/>
-        >    file: ./solomon-secrets/ ${ENV}/http/elasticsearch/http.p12<br/>
-        >  kibana.http.ca:<br/>
-        >    file: ./solomon-secrets/ ${ENV}/http/kibana/elasticsearch-ca.pem<br/>
+        ```console
+        secrets:
+          elasticsearch.http.keystore:
+            file: ./solomon-secrets/${ENV}/http/elasticsearch/http.p12
+          kibana.http.ca:
+            file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
+        ```
 
     - Update the elasticsearch service
-        >secrets:<br/>
-        >  - source: elasticsearch.http.keystore<br/>
-        >    target: /usr/share/elasticsearch/config/certs/http.p12<br/>
-        >  - source: kibana.http.ca<br/>
-        >    target: /certs/elasticsearch-ca.pem<br/>
+        ```console
+        secrets:
+          - source: elasticsearch.http.keystore
+            target: /usr/share/elasticsearch/config/certs/http.p12
+          - source: kibana.http.ca
+            target: /certs/elasticsearch-ca.pem
+        ```
+        <br/>
 
-<br/>
+
 Docker Compose Build
 ----
 Just run the following commad:
-><i>make build-solomon</i><br/>
+```console
+make ksd-build
+```
 
 This will trigger the creation of the following images
-><br>
->1. ksd/es:${ElasticsearchVersion}- \$\{ENV\}<br/>
->Example: ksd/es:7.11.1-local
-><br/>
-><br/>
->2. ksd/kibana:${ElasticsearchVersion}- \$\{ENV\}<br/>
->Example: ksd/kibana:7.11.1-local
-><br>
-><br/>
+<br>
+>ksd/es:${ElasticsearchVersion}-\$\{ENV\}<br/>
+>Example: ksd/es:8.10.4-local
+<br/>
+
+>ksd/kibana:${ElasticsearchVersion}-\$\{ENV\}<br/>
+>Example: ksd/kibana:8.10.4-local
 
 <br/>
+
 Docker Compose Up
 -----
 Just run the following commad:
-><i>make elk-solomon</i><br/>
->**OR**</br>
-><i>docker-compose -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml -f docker-compose.data.solomon.yml up --no-deps -d --no-recreate kibana es0 es1 es2 es3 es4</i><br/>
+```console
+make ksd-elk
+```
+**OR**</br>
+```console
+docker-compose -f docker-compose.ksd.yml -f docker-compose.ksd.nodes.yml -f docker-compose.ksd.data.yml up --no-deps -d --no-recreate kibana es0 es1 es2 es3 es4
+```
+Note: The command above will put up the 5-node elasticsearch service including kibana
 
-The command above will put up the 5-node elasticsearch service including kibana
 </br>
-</br>
+
 To leave out the elasticsearch data nodes (es3 and es4), run the command:
-
-><i>docker-compose -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml -f docker-compose.data.solomon.yml up --no-deps -d --no-recreate kibana es0 es1 es2</i><br/>
+```console
+docker-compose -f docker-compose.ksd.yml -f docker-compose.ksd.nodes.yml -f docker-compose.ksd.data.yml up --no-deps -d --no-recreate kibana es0 es1 es2
+```
 
 <br/>
+
 To test the elasticsearch service, run the command:
-
->curl -fsSkL "$ELASTICSEARCH_SCHEME://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@$host:9200/_cat/health?h=status"
-
+```console
+curl -fsSkL "${ELASTICSEARCH_SCHEME}://${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}@${host}:9200/_cat/health?h=status"
+```
 Note: Change the variables accordingly
 
 <br/>
+
 To test the kibana service, run the command:
-
->curl -fsSkL "$KIBANA_SCHEME://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@$host:5601/api/status" | grep -Eo '"overall"[^}]*' | grep -Eo '"state"[^,]*' | grep -Eo '"green"[^"]*' | sed -r 's/"//g'
-
+```console
+curl -fsSkL "${KIBANA_SCHEME}://${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}@${host}:5601/api/status" | grep -Eo '"overall"[^}]*' | grep -Eo '"state"[^,]*' | grep -Eo '"green"[^"]*' | sed -r 's/"//g'
+```
 Note: Change the variables accordingly
 
-
-
 <br/>
+
 Connecting the Solomon Backend application to Elastic Search Cluster
 ----
 To connect a specific container to an already existing network, run:
-
-> <i>docker network connect --alias [network alias] [network name] [container]</i><br/>
->Example:<br/>
-><i>docker network connect --alias elastic_network elastic my_containiner</i>
+```console
+docker network connect --alias [network alias] [network name] [container]
+Example: docker network connect --alias elastic_network elastic my_containiner
+```
 
 To disconnect an existing container to a defined network, run:
-
-><i>docker network disconnect [network name] [container]</i><br/>
-> Example:<br/>
-><i>docker network disconnect elastic my_container</i>
+```console
+docker network disconnect [network name] [container]
+Example: docker network disconnect elastic my_container
+```
 
 <br/>
+
 Defining the elasticsearch configuration in **solomon-backend**
 ---
+
 1. Copy the file 
-    >**solomon-secrets > local > http > ca > ca.p12**
+    >**solomon-secrets/local/http/ca/ca.p12**
 
     To the directory in **solomon-web** project 
-    >**src > main > resources > certs**
+    >**src/main/resources/certs**
 
     Rename it using the format: **ca_[ENV].p12** (Example: **ca_local.p12**)
 
 2. Define the elasticsearch configuration as below
-    >es:<br/>
-    >  connectionMode: ${ES_CONN_MODE}<br/>
-    >  clusterName: docker-cluster<br/>
-    >  server: ${ES_SERVER}<br/>
-    >  port: ${ES_PORT}<br/>
-    >  useSSL: ${ES_USE_SSL}<br/>
-    >  username: ${ES_USERNAME}<br/>
-    >  password: ${ES_PASSWORD}<br/>
-    >  certRelPath: certs/ca_${app.env}.p12<br/>
+    ```console
+    es:
+      connectionMode: ${ES_CONN_MODE}
+      clusterName: docker-cluster
+      server: ${ES_SERVER}
+      port: ${ES_PORT}
+      useSSL: ${ES_USE_SSL}
+      username: ${ES_USERNAME}
+      password: ${ES_PASSWORD}
+      certRelPath: certs/ca_${app.env}.p12
 
-    Notes:<br/>
-    >**ES_CONN_MODE**: CA_CERTIFICATE<br/>
-    >**ES_SERVER**: [Elasticsearch Server - Either domain or IP]<br/>
-    >**ES_PORT**: [Elasticsearch Server Port]<br/>
-    >**ES_USE_SSL**: true<br/>
-    >**ES_USERNAME**: [Defined Elasticsearch Username]<br/>
-    >**ES_PASSWORD**: [Defined Elasticsearch Password]<br/>
+    Where variables are:
+
+    ES_USE_SSL: true
+    ES_CONN_MODE: CA_CERTIFICATE
+    ES_SERVER: [Elasticsearch Server - Either domain or IP]
+    ES_PORT: [Elasticsearch Server Port]
+    ES_USERNAME: [Defined Elasticsearch Username]
+    ES_PASSWORD: [Defined Elasticsearch Password]
+    ```
