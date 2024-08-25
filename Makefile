@@ -1,11 +1,12 @@
 .DEFAULT_GOAL:=help
 
-SOLOMON_FILES := -f docker-compose.solomon.yml -f docker-compose.nodes.solomon.yml -f docker-compose.data.solomon.yml
+KSD_FILES := -f docker-compose.ksd.yml -f docker-compose.ksd.nodes.yml -f docker-compose.ksd.data.yml
+KSD_ELK := es0 kibana
+
 COMPOSE_ALL_FILES := -f docker-compose.yml -f docker-compose.monitor.yml -f docker-compose.tools.yml -f docker-compose.nodes.yml -f docker-compose.logs.yml
 COMPOSE_MONITORING := -f docker-compose.yml -f docker-compose.monitor.yml
 COMPOSE_LOGGING := -f docker-compose.yml -f docker-compose.logs.yml
 COMPOSE_NODES := -f docker-compose.yml -f docker-compose.nodes.yml
-ELK_SOLOMON := es0 kibana
 ELK_SERVICES   := elasticsearch logstash kibana apm-server
 ELK_LOG_COLLECTION := filebeat
 ELK_MONITORING := elasticsearch-exporter logstash-exporter filebeat-cluster-logs
@@ -39,8 +40,6 @@ all:		    ## Start Elk and all its component (ELK, Monitoring, and Tools).
 elk:		    ## Start ELK.
 	$(DOCKER_COMPOSE_COMMAND) up -d --build
 
-elk-solomon:		    ## Start ELK.
-	docker-compose ${SOLOMON_FILES} up --no-deps -d --no-recreate  
 up:
 	@make elk
 	@echo "Visit Kibana: https://localhost:5601 (user: elastic, password: changeme) [Unless you changed values in .env]"
@@ -58,9 +57,6 @@ build:			## Build ELK and all its extra components.
 	$(DOCKER_COMPOSE_COMMAND) ${COMPOSE_ALL_FILES} build ${ELK_ALL_SERVICES}
 ps:				## Show all running containers.
 	$(DOCKER_COMPOSE_COMMAND) ${COMPOSE_ALL_FILES} ps
-
-build-solomon:
-	@docker-compose ${SOLOMON_FILES} build --force-rm ${ELK_SOLOMON}
 
 down:			## Down ELK and all its extra components.
 	$(DOCKER_COMPOSE_COMMAND) ${COMPOSE_ALL_FILES} down
@@ -87,3 +83,9 @@ prune:			## Remove ELK Containers and Delete ELK-related Volume Data (the elasti
 help:       	## Show this help.
 	@echo "Make Application Docker Images and Containers using Docker-Compose files in 'docker' Dir."
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m (default: help)\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+
+ksd-build:
+	@docker-compose ${KSD_FILES} build --force-rm ${KSD_ELK}
+
+ksd-elk:		    ## Start ELK.
+	docker-compose ${KSD_FILES} up --no-deps -d --no-recreate  
