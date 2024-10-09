@@ -1,6 +1,9 @@
 .idea/
 .DS_Store
+secrets/*
+!secrets/certs/.gitkeep
 secrets/certs/*
+!secrets/keystore/.gitkeep
 secrets/keystore/*
 tools/elastalert/rules/*
 
