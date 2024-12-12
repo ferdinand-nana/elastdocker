@@ -8,10 +8,6 @@ volumes:
 services:
   es3:
     image: ksd/es:${ELK_VERSION}
-    build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: ${ELK_VERSION}
 #    restart: unless-stopped
     environment:
       ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME}
@@ -21,6 +17,7 @@ services:
       ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_3}
       ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
       ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ELASTICSEARCH_PORT: ${ELASTICSEARCH_PORT}
       ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
       bootstrap.memory_lock: "true"
     volumes:
@@ -48,10 +45,6 @@ services:
         
   es4:
     image: ksd/es:${ELK_VERSION}
-    build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: ${ELK_VERSION}
     #    restart: unless-stopped
     environment:
       ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME}
@@ -61,6 +54,7 @@ services:
       ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_4}
       ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
       ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ELASTICSEARCH_PORT: ${ELASTICSEARCH_PORT}
       ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
       bootstrap.memory_lock: "true"
     volumes:
