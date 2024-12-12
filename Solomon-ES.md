@@ -5,21 +5,12 @@ Provide credentials
 -----------
 The following properties must be set properly in the corresponding .env file
 
-<<<<<<< HEAD
-```console
-ELASTIC_USERNAME=elastic
-ELASTIC_PASSWORD=changeme
-```
-
-Setup
-=======
 > ELASTIC_USERNAME=_**elastic**_<br/>
 > ELASTIC_PASSWORD=_**changeme**_
 
 <br/>
 
 Setup  
->>>>>>> d9a30f0 (Added new comments)
 -----------
 
 
