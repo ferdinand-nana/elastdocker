@@ -32,8 +32,8 @@ unzip -qq $ZIP_CA_FILE -d $OUTPUT_DIR;
 printf "Unzipping Certifications... \n"
 unzip -qq $ZIP_FILE -d $OUTPUT_DIR;
 
-printf "Applying Permissions... \n"
-chown -R 1000:0 $OUTPUT_DIR
+# printf "Applying Permissions to %s:0... \n" "$USER_UID"
+# chown -R "$USER_UID":0 $OUTPUT_DIR
 find $OUTPUT_DIR -type f -exec chmod 655 -- {} +
 
 printf "=====================================================\n"
