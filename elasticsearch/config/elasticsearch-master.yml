@@ -6,6 +6,7 @@ node.name: ${ELASTIC_NODE_NAME}
 # node.roles: [ data, master ]
 network.host: 0.0.0.0
 transport.host: 0.0.0.0
+http.port: ${ELASTICSEARCH_PORT}
 
 ## Cluster Settings
 discovery.seed_hosts: ${ELASTIC_DISCOVERY_SEEDS}

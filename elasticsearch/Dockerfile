@@ -1,7 +1,7 @@
 ARG ELK_VERSION
 
 # https://github.com/elastic/elasticsearch-docker
-FROM docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+FROM docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-8.13.4}
 
 # Add healthcheck
 COPY scripts/docker-healthcheck .
