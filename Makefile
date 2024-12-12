@@ -85,7 +85,7 @@ help:       	## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m (default: help)\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 ksd-build:
-	@docker-compose ${KSD_FILES} build --force-rm ${KSD_ELK}
+	$(DOCKER_COMPOSE_COMMAND) ${KSD_FILES} build --force-rm ${KSD_ELK}
 
 ksd-elk:		    ## Start ELK.
-	docker-compose ${KSD_FILES} up --no-deps -d --no-recreate  
+	$(DOCKER_COMPOSE_COMMAND) ${KSD_FILES} up --no-deps -d --no-recreate  
