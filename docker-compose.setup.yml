@@ -1,5 +1,3 @@
-version: '3.5'
-
 services:
   keystore:
     image: elastdocker/elasticsearch:${ELK_VERSION}
@@ -26,3 +24,5 @@ services:
     volumes:
       - ./secrets:/secrets
       - ./setup/:/setup
+    environment:
+      USER_UID: ${USER_UID}

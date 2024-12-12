@@ -98,7 +98,7 @@ Setup
     - Creation of KeyStore containing the certificate to enable TLS on the HTTP layer
         - Spawn an elasticsearch container using the command:
             ```console
-            docker run --rm --name es -p 19200:9200 -p 19300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+            docker run --rm --name es -p 19200:9200 -p 19300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.13.4
             ```
         
         - Attach to the container created:
@@ -246,7 +246,7 @@ make ksd-elk
 ```
 **OR**</br>
 ```console
-docker-compose -f docker-compose.ksd.yml -f docker-compose.ksd.nodes.yml -f docker-compose.ksd.data.yml up --no-deps -d --no-recreate kibana es0 es1 es2 es3 es4
+docker compose -f docker-compose.ksd.yml -f docker-compose.ksd.nodes.yml -f docker-compose.ksd.data.yml up --no-deps -d --no-recreate kibana es0 es1 es2 es3 es4
 ```
 Note: The command above will put up the 5-node elasticsearch service including kibana
 
