@@ -1,9 +1,11 @@
 .DEFAULT_GOAL:=help
 
+include .env
+
 KSD_FILES := -f docker-compose.ksd.yml -f docker-compose.ksd.nodes.yml -f docker-compose.ksd.data.yml
 KSD_ELK := es0 kibana
 
-COMPOSE_ALL_FILES := -f docker-compose.yml -f docker-compose.monitor.yml -f docker-compose.tools.yml -f docker-compose.nodes.yml -f docker-compose.logs.yml
+COMPOSE_ALL_FILES := -f docker-compose.yml -f docker-compose.monitor.yml -f docker-compose.nodes.yml -f docker-compose.logs.yml
 COMPOSE_MONITORING := -f docker-compose.yml -f docker-compose.monitor.yml
 COMPOSE_LOGGING := -f docker-compose.yml -f docker-compose.logs.yml
 COMPOSE_NODES := -f docker-compose.yml -f docker-compose.nodes.yml
@@ -26,6 +28,13 @@ endif
 
 keystore:		## Setup Elasticsearch Keystore, by initializing passwords, and add credentials defined in `keystore.sh`.
 	$(DOCKER_COMPOSE_COMMAND) -f docker-compose.setup.yml run --rm keystore
+
+upgrade-keystore:	## Upgrade Elasticsearch Keystore, which is necessary when upgrading to an Elasticsearch version that uses a newer Java version.
+	@if [ -n "$$($(DOCKER_COMPOSE_COMMAND) ps -q)" ]; then \
+		echo "Please stop all running containers before upgrading the keystore."; \
+		exit 1; \
+	fi
+	$(DOCKER_COMPOSE_COMMAND) -f docker-compose.setup.yml run --rm upgrade-keystore
 
 certs:		    ## Generate Elasticsearch SSL Certs.
 	$(DOCKER_COMPOSE_COMMAND) -f docker-compose.setup.yml run --rm certs
@@ -78,7 +87,7 @@ images:			## Show all Images of ELK and all its extra components.
 
 prune:			## Remove ELK Containers and Delete ELK-related Volume Data (the elastic_elasticsearch-data volume)
 	@make stop && make rm
-	@docker volume prune -f --filter label=com.docker.compose.project=elastic
+	@docker volume prune -f --filter label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}
 
 help:       	## Show this help.
 	@echo "Make Application Docker Images and Containers using Docker-Compose files in 'docker' Dir."

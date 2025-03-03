@@ -1,6 +1,6 @@
 services:
   keystore:
-    image: elastdocker/elasticsearch:${ELK_VERSION}
+    image: ${ELASTICSEARCH_IMAGE_NAME}:${ELK_VERSION}
     build:
       context: elasticsearch/
       args:
@@ -13,8 +13,13 @@ services:
     environment:
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
 
+  upgrade-keystore:
+    extends:
+      service: keystore
+    command: bash /setup/upgrade-keystore.sh
+
   certs:
-    image: elastdocker/elasticsearch:${ELK_VERSION}
+    image: ${ELASTICSEARCH_IMAGE_NAME}:${ELK_VERSION}
     build:
       context: elasticsearch/
       args:
