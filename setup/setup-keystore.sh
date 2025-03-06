@@ -16,6 +16,7 @@ ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-$PW}"
 export ELASTIC_PASSWORD
 
 # Create Keystore
+printf "\n"
 printf "========== Creating Elasticsearch Keystore ==========\n"
 printf "=====================================================\n"
 elasticsearch-keystore create >> /dev/null
@@ -56,6 +57,7 @@ echo "Saving new service_tokens file"
 mv $GENERATED_SERVICE_TOKENS $OUTPUT_SERVICE_TOKENS
 chmod 0644 $OUTPUT_SERVICE_TOKENS
 
+printf "\n"
 printf "======= Keystore setup completed successfully =======\n"
 printf "=====================================================\n"
 printf "Remember to restart the stack, or reload secure settings if changed settings are hot-reloadable.\n"
@@ -64,3 +66,4 @@ printf "=====================================================\n"
 printf "Your 'elastic' user password is: $ELASTIC_PASSWORD\n"
 printf "Your Kibana Service Token is: $TOKEN\n"
 printf "=====================================================\n"
+printf "\n"
