@@ -24,6 +24,11 @@ fi
 # Set the MACHINE_ARCH as an environment variable
 export MACHINE_ARCH
 
+# Check if the host machine is Linux and set vm.max_map_count
+if [[ "$(uname -s)" == "Linux" ]]; then
+    sudo sysctl -w vm.max_map_count=262144
+fi
+
 # Create the docker containers
 docker compose -f docker-compose.ksd.yml -f docker-compose.ksd.nodes.yml -f docker-compose.ksd.data.yml up --no-deps -d --no-recreate es0 es1 es2 kibana
 
