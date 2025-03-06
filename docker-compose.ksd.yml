@@ -81,6 +81,9 @@ services:
         max-file: "5"
     healthcheck:
       test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:$ELASTICSEARCH_PORT/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
 
   kibana:
     image: ksd/kibana:${ELK_VERSION}
@@ -114,8 +117,13 @@ services:
       - "${KIBANA_PORT}:${KIBANA_PORT}"
     links: 
       - "es0:elasticsearch"
-    depends_on: 
-      - es0
+    depends_on:
+      es0:
+        condition: service_healthy
+      es1:
+        condition: service_healthy
+      es2:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
