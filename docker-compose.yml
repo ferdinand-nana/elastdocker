@@ -12,27 +12,27 @@ volumes:
 
 secrets:
   elasticsearch.keystore:
-    file: ./solomon-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
+    file: ./ksd-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
   elasticsearch.service_tokens:
     file: ./secrets/service_tokens
   elastic.ca:
-    file: ./solomon-secrets/${ENV}/ssl/certs/ca/ca.crt
+    file: ./ksd-secrets/${ENV}/ssl/certs/ca/ca.crt
   elasticsearch.certificate:
-    file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
+    file: ./ksd-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
   elasticsearch.key:
-    file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
+    file: ./ksd-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
   elasticsearch.http.keystore:
-    file: ./solomon-secrets/${ENV}/http/elasticsearch/http.p12
+    file: ./ksd-secrets/${ENV}/http/elasticsearch/http.p12
   kibana.certificate:
-    file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.crt
+    file: ./ksd-secrets/${ENV}/ssl/certs/kibana/kibana.crt
   kibana.key:
-    file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.key
+    file: ./ksd-secrets/${ENV}/ssl/certs/kibana/kibana.key
   kibana.http.ca:
-    file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
+    file: ./ksd-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
   apm-server.certificate:
-    file: ./solomon-secrets/${ENV}/ssl/certs/apm-server/apm-server.crt
+    file: ./ksd-secrets/${ENV}/ssl/certs/apm-server/apm-server.crt
   apm-server.key:
-    file: ./solomon-secrets/${ENV}/ssl/certs/apm-server/apm-server.key
+    file: ./ksd-secrets/${ENV}/ssl/certs/apm-server/apm-server.key
 
 services:
   elasticsearch:
