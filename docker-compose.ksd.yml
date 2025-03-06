@@ -10,31 +10,27 @@ volumes:
 
 secrets:
   elasticsearch.keystore:
-    file: ./solomon-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
+    file: ./ksd-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
   elasticsearch.service_tokens:
-    file: ./solomon-secrets/${ENV}/ssl/service_tokens
+    file: ./ksd-secrets/${ENV}/ssl/service_tokens
   elastic.ca:
-    file: ./solomon-secrets/${ENV}/ssl/certs/ca/ca.crt
+    file: ./ksd-secrets/${ENV}/ssl/certs/ca/ca.crt
   elasticsearch.certificate:
-    file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
+    file: ./ksd-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
   elasticsearch.key:
-    file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
+    file: ./ksd-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
   elasticsearch.http.keystore:
-    file: ./solomon-secrets/${ENV}/http/elasticsearch/http.p12
+    file: ./ksd-secrets/${ENV}/http/elasticsearch/http.p12
   kibana.certificate:
-    file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.crt
+    file: ./ksd-secrets/${ENV}/ssl/certs/kibana/kibana.crt
   kibana.key:
-    file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.key
+    file: ./ksd-secrets/${ENV}/ssl/certs/kibana/kibana.key
   kibana.http.ca:
-    file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
+    file: ./ksd-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
 
 services:
   es0:
-    image: ksd/es:${ELK_VERSION}
-    build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: ${ELK_VERSION}
+    image: $KSD_ES_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$MACHINE_ARCH
     restart: unless-stopped
     environment:
       ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME}
@@ -86,11 +82,7 @@ services:
       retries: 120
 
   kibana:
-    image: ksd/kibana:${ELK_VERSION}
-    build:
-      context: kibana/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: $KSD_KIBANA_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$MACHINE_ARCH
     restart: unless-stopped
     volumes:
       - ./kibana/config/:/usr/share/kibana/config:ro
@@ -103,7 +95,7 @@ services:
       ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
       KIBANA_PORT: ${KIBANA_PORT}
     env_file:
-      - ./solomon-secrets/${ENV}/ssl/.env.kibana.token
+      - ./ksd-secrets/${ENV}/ssl/.env.kibana.token
     secrets:
       - source: elastic.ca
         target: /certs/ca.crt
