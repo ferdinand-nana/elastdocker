@@ -41,7 +41,7 @@ Setup
 
 
         Copy the created **`certs`** and **`keystore`** directories under the directory<br/>
-        > solomon-secrets/**\$\{ENV\}**/ssl<br/>
+        > ksd-secrets/**\$\{ENV\}**/ssl<br/>
         > Note: The **\$\{ENV\}** corresponds to the set **ENV** value defined in .env file
 
         <br/>
@@ -53,17 +53,17 @@ Setup
         ```console
         secrets:
           elasticsearch.keystore:
-            file: ./solomon-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
+            file: ./ksd-secrets/${ENV}/ssl/keystore/elasticsearch.keystore
           elastic.ca:
-            file: ./solomon-secrets/${ENV}/ssl/certs/ca/ca.crt
+            file: ./ksd-secrets/${ENV}/ssl/certs/ca/ca.crt
           elasticsearch.certificate:
-            file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
+            file: ./ksd-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.crt
           elasticsearch.key:
-            file: ./solomon-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
+            file: ./ksd-secrets/${ENV}/ssl/certs/elasticsearch/elasticsearch.key
           kibana.certificate:
-            file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.crt
+            file: ./ksd-secrets/${ENV}/ssl/certs/kibana/kibana.crt
           kibana.key:
-            file: ./solomon-secrets/${ENV}/ssl/certs/kibana/kibana.key
+            file: ./ksd-secrets/${ENV}/ssl/certs/kibana/kibana.key
         ```
         > Note: The ${ENV} corresponds to the set ENV value defined in .env file
 
@@ -163,10 +163,10 @@ Setup
             >Zip file written to /usr/share/elasticsearch/elasticsearch-ssl-http.zip
         
         - Go to the directory below (or create if needed)
-            > solomon-secrets/**\$\{ENV\}**/http<br/>
+            > ksd-secrets/**\$\{ENV\}**/http<br/>
             > Note: The **\$\{ENV\}** corresponds to the set **ENV** value defined in .env file
         
-        - Copy the created zip file to `solomon-secrets/${ENV}/http` by running the command:
+        - Copy the created zip file to `ksd-secrets/${ENV}/http` by running the command:
             ```console
             docker cp es:/usr/share/elasticsearch/elasticsearch-ssl-http.zip .
             ```
@@ -203,9 +203,9 @@ Setup
         ```console
         secrets:
           elasticsearch.http.keystore:
-            file: ./solomon-secrets/${ENV}/http/elasticsearch/http.p12
+            file: ./ksd-secrets/${ENV}/http/elasticsearch/http.p12
           kibana.http.ca:
-            file: ./solomon-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
+            file: ./ksd-secrets/${ENV}/http/kibana/elasticsearch-ca.pem
         ```
 
     - Update the elasticsearch service
@@ -295,7 +295,7 @@ Defining the elasticsearch configuration in **solomon-backend**
 ---
 
 1. Copy the file 
-    >**solomon-secrets/local/http/ca/ca.p12**
+    >**ksd-secrets/local/http/ca/ca.p12**
 
     To the directory in **solomon-web** project 
     >**src/main/resources/certs**
