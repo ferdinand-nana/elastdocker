@@ -31,3 +31,18 @@ services:
       - ./setup/:/setup
     environment:
       USER_UID: ${USER_UID}
+
+  http:
+    image: ${ELASTICSEARCH_IMAGE_NAME}:${ELK_VERSION}
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    command: bash /setup/setup-http.sh
+    user: "0"
+    volumes:
+      - ./secrets:/secrets
+      - ./setup/:/setup
+    environment:
+      USER_UID: ${USER_UID}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}

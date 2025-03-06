@@ -39,9 +39,13 @@ upgrade-keystore:	## Upgrade Elasticsearch Keystore, which is necessary when upg
 certs:		    ## Generate Elasticsearch SSL Certs.
 	$(DOCKER_COMPOSE_COMMAND) -f docker-compose.setup.yml run --rm certs
 
+http:		    ## Generate Elasticsearch HTTP Certs.
+	$(DOCKER_COMPOSE_COMMAND) -f docker-compose.setup.yml run --rm http
+
 setup:		    ## Generate Elasticsearch SSL Certs and Keystore.
 	@make certs
 	@make keystore
+	@make http
 
 all:		    ## Start Elk and all its component (ELK, Monitoring, and Tools).
 	$(DOCKER_COMPOSE_COMMAND) ${COMPOSE_ALL_FILES} up -d --build ${ELK_MAIN_SERVICES}
@@ -96,5 +100,8 @@ help:       	## Show this help.
 ksd-build:
 	$(DOCKER_COMPOSE_COMMAND) ${KSD_FILES} build --force-rm ${KSD_ELK}
 
-ksd-elk:		    ## Start ELK.
-	$(DOCKER_COMPOSE_COMMAND) ${KSD_FILES} up --no-deps -d --no-recreate  
+ksd-elk-full:		    ## Start ELK.
+	$(DOCKER_COMPOSE_COMMAND) ${KSD_FILES} up --no-deps -d --no-recreate es0 es1 es2 es3 es4 kibana
+
+ksd-elk-3node:		    ## Start ELK.
+	$(DOCKER_COMPOSE_COMMAND) ${KSD_FILES} up --no-deps -d --no-recreate es0 es1 es2 kibana
