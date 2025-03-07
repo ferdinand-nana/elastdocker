@@ -5,7 +5,7 @@ volumes:
 
 services:
   es3:
-    image: $KSD_ES_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$MACHINE_ARCH
+    image: $KSD_ES_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-$MACHINE_ARCH
     restart: unless-stopped
     environment:
       ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME}
@@ -54,7 +54,7 @@ services:
       retries: 120
               
   es4:
-    image: $KSD_ES_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$MACHINE_ARCH
+    image: $KSD_ES_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-$MACHINE_ARCH
     restart: unless-stopped
     environment:
       ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME}

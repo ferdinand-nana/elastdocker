@@ -131,32 +131,32 @@ printf "=====================================================\n"
 printf "\n"
 
 # Build the KSD Elasticsearch image
-build_docker_image "linux/arm64/v8" "$KSD_ES_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-arm64" "./elasticsearch/Dockerfile" "./elasticsearch"
-build_docker_image "linux/amd64/v3" "$KSD_ES_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-amd64" "./elasticsearch/Dockerfile" "./elasticsearch"
+build_docker_image "linux/arm64/v8" "$KSD_ES_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-arm64" "./elasticsearch/Dockerfile" "./elasticsearch"
+build_docker_image "linux/amd64/v3" "$KSD_ES_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-amd64" "./elasticsearch/Dockerfile" "./elasticsearch"
 printf "Elasticsearch Images built successfully! 🎉🎉🎉\n"
 
 # Build the KSD Elasticsearch image
 printf "\n\n"
-build_docker_image "linux/arm64/v8" "$KSD_KIBANA_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-arm64" "./kibana/Dockerfile" "./kibana"
-build_docker_image "linux/amd64/v3" "$KSD_KIBANA_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-amd64" "./kibana/Dockerfile" "./kibana"
+build_docker_image "linux/arm64/v8" "$KSD_KIBANA_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-arm64" "./kibana/Dockerfile" "./kibana"
+build_docker_image "linux/amd64/v3" "$KSD_KIBANA_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-amd64" "./kibana/Dockerfile" "./kibana"
 printf "Kibana Images built successfully! 🎉🎉🎉\n"
 
 
 # Creating tar file for elasticsearch image
-ES_IMAGE_TAR="ksd-es-$KSD_ES_VERSION-$ELK_VERSION-$KSD_TARGET_IMAGE_ARCH.tar"
-echo "Saving Elasticsearch image $KSD_ES_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$KSD_TARGET_IMAGE_ARCH to $ES_IMAGE_TAR ..."
-docker save -o "$ES_IMAGE_TAR" "$KSD_ES_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$KSD_TARGET_IMAGE_ARCH"
+ES_IMAGE_TAR="ksd-es-$ELK_VERSION-$KSD_ES_VERSION-$KSD_TARGET_IMAGE_ARCH.tar"
+echo "Saving Elasticsearch image $KSD_ES_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-$KSD_TARGET_IMAGE_ARCH to $ES_IMAGE_TAR ..."
+docker save -o "$ES_IMAGE_TAR" "$KSD_ES_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-$KSD_TARGET_IMAGE_ARCH"
 echo "Elasticsearch image saved as $ES_IMAGE_TAR"
 
 # Creating tar file for kibana image
-KIBANA_IMAGE_TAR="ksd-kibana-$KSD_ES_VERSION-$ELK_VERSION-$KSD_TARGET_IMAGE_ARCH.tar"
-echo "Saving Kibana image $KSD_KIBANA_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$KSD_TARGET_IMAGE_ARCH to $KIBANA_IMAGE_TAR ..."
-docker save -o "$KIBANA_IMAGE_TAR" "$KSD_KIBANA_IMAGE_NAME:$KSD_ES_VERSION-$ELK_VERSION-$KSD_TARGET_IMAGE_ARCH"
+KIBANA_IMAGE_TAR="ksd-kibana-$ELK_VERSION-$KSD_ES_VERSION-$KSD_TARGET_IMAGE_ARCH.tar"
+echo "Saving Kibana image $KSD_KIBANA_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-$KSD_TARGET_IMAGE_ARCH to $KIBANA_IMAGE_TAR ..."
+docker save -o "$KIBANA_IMAGE_TAR" "$KSD_KIBANA_IMAGE_NAME:$ELK_VERSION-$KSD_ES_VERSION-$KSD_TARGET_IMAGE_ARCH"
 echo "Kibana image saved as $KIBANA_IMAGE_TAR"
 
 # Building the zip file for release
 CURRENT_DATE=$(date +"%Y%m%d%H%M%S")
-ZIP_FILE="ksd-es-kibana_$KSD_ES_VERSION-$ELK_VERSION-$KSD_TARGET_IMAGE_ARCH_$ENV_$CURRENT_DATE.zip"
+ZIP_FILE="ksd-es-kibana_${ELK_VERSION}-${KSD_ES_VERSION}-${KSD_TARGET_IMAGE_ARCH}_${ENV}_${CURRENT_DATE}.zip"
 echo "Creating zip file $ZIP_FILE ..."
 zip "$ZIP_FILE" .env ksd-load.sh ksd-run.sh "$ES_IMAGE_TAR" "$KIBANA_IMAGE_TAR" \
     docker-compose.ksd*.yml elasticsearch/config/* elasticsearch/scripts/* kibana/config/* \
